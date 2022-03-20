@@ -120,7 +120,6 @@ firewall() { local port="${1:-1194}" docker_network="$(ip -o addr show dev eth0|
         } || iptables -A OUTPUT -d 127.0.0.11 -j ACCEPT; fi
     iptables -t nat -A POSTROUTING -o tap+ -j MASQUERADE
     iptables -t nat -A POSTROUTING -o tun+ -j MASQUERADE
-    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
     [[ -r $firewall_cust ]] && . $firewall_cust
     for i in $route6 $route; do [[ -e $i ]] || touch $i; done
     [[ -s $route6 ]] && for net in $(cat $route6); do return_route6 $net; done
@@ -187,6 +186,7 @@ return_route() { local network="$1" gw="$(ip route |awk '/default/ {print $3}')"
     iptables -A FORWARD -d $network -j ACCEPT
     iptables -A FORWARD -s $network -j ACCEPT
     iptables -A OUTPUT -d $network -j ACCEPT
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE    
     [[ -e $route ]] && grep -q "^$network\$" $route || echo "$network" >>$route
 }
 
