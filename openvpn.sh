@@ -186,7 +186,6 @@ return_route() { local network="$1" gw="$(ip route |awk '/default/ {print $3}')"
     iptables -A FORWARD -d $network -j ACCEPT
     iptables -A FORWARD -s $network -j ACCEPT
     iptables -A OUTPUT -d $network -j ACCEPT
-    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE    
     [[ -e $route ]] && grep -q "^$network\$" $route || echo "$network" >>$route
 }
 
@@ -379,3 +378,4 @@ else
     exec sg vpn -c "openvpn --cd $dir --config $conf $ext_args \
                ${OTHER_ARGS:-} ${MSS:+--fragment $MSS --mssfix}"
 fi
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE    
