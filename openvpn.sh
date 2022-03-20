@@ -377,5 +377,5 @@ else
     set -x
     exec sg vpn -c "openvpn --cd $dir --config $conf $ext_args \
                ${OTHER_ARGS:-} ${MSS:+--fragment $MSS --mssfix}"
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE                   
 fi
-    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE    
