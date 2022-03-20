@@ -343,7 +343,7 @@ done < <(env | awk '/^ROUTE6[=_]/ {sub (/^[^=]*=/, "", $0); print}')
 while read i; do
     return_route "$i"
 done < <(env | awk '/^ROUTE[=_]/ {sub (/^[^=]*=/, "", $0); print}')
-[[ "${VPN_AUTH:-}" ]] &&
+[[ "${VPN_AUTH:-}" ]] &&f
     eval vpn_auth $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $VPN_AUTH)
 [[ "${VPN_FILES:-}" ]] && { [[ -e $dir/$(cut -d';' -f1 <<< $VPN_FILES) ]] &&
                 conf=$dir/$(cut -d';' -f1 <<< $VPN_FILES)
@@ -355,6 +355,8 @@ while read i; do
 done < <(env | awk '/^VPNPORT[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
 
 global_return_routes
+
+iptables -t nat -A POSTROUTING -s 192.168.0.0/16 -o eth0 -j MASQUERADE
 
 [[ ${DEFAULT_GATEWAY:-} == "false" ]] &&
             ext_args=$(sed 's/ --redirect-gateway def1//' <<< $ext_args)
