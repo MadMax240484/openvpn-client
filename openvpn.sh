@@ -120,6 +120,7 @@ firewall() { local port="${1:-1194}" docker_network="$(ip -o addr show dev eth0|
         } || iptables -A OUTPUT -d 127.0.0.11 -j ACCEPT; fi
     iptables -t nat -A POSTROUTING -o tap+ -j MASQUERADE
     iptables -t nat -A POSTROUTING -o tun+ -j MASQUERADE
+    iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
     [[ -r $firewall_cust ]] && . $firewall_cust
     for i in $route6 $route; do [[ -e $i ]] || touch $i; done
     [[ -s $route6 ]] && for net in $(cat $route6); do return_route6 $net; done
@@ -307,7 +308,7 @@ cert="$dir/vpn-ca.crt"
 firewall_cust="$dir/.firewall_cust"
 route="$dir/.firewall"
 route6="$dir/.firewall6"
-export ext_args="--script-security 2 --redirect-gateway def1"
+export ext_args="--script-security 2"
 [[ -f $conf ]] || { [[ $(ls -d $dir/*|egrep '\.(conf|ovpn)$' 2>&-|wc -w) -eq 1 \
             ]] && conf="$(ls -d $dir/* | egrep '\.(conf|ovpn)$' 2>&-)"; }
 [[ -f $cert ]] || { [[ $(ls -d $dir/* | egrep '\.ce?rt$' 2>&- | wc -w) -eq 1 \
