@@ -376,9 +376,5 @@ else
         { echo "ERROR: VPN CA cert missing!"; sleep 120; }
     set -x
     exec sg vpn -c "openvpn --cd $dir --config $conf $ext_args \
-               ${OTHER_ARGS:-} ${MSS:+--fragment $MSS --mssfix}"
-    exec sg sleep  -c "sleep 10"
-    echo "выполняем задержку"
-    ip r | grep tun0| awk '/tun0 proto kernel*/ {print $1}' | xargs -0 \
-    iptables -t nat -A POSTROUTING -s $net -o eth0 -j MASQUERADE                               
+               ${OTHER_ARGS:-} ${MSS:+--fragment $MSS --mssfix}"                              
 fi
