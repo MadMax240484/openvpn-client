@@ -377,7 +377,6 @@ else
     set -x
     exec sg vpn -c "openvpn --cd $dir --config $conf $ext_args \
                ${OTHER_ARGS:-} ${MSS:+--fragment $MSS --mssfix}"
-    echo "Добавляем маскарад."           
-    net=$(ip r | grep tun0| awk '/tun0 proto kernel*/ {print $1}')
-    iptables -t nat -A POSTROUTING -s $net -o eth0 -j MASQUERADE                                  
+    exec sg vpn -c "net=$(ip r | grep tun0| awk '/tun0 proto kernel*/ {print $1}');
+    iptables -t nat -A POSTROUTING -s $net -o eth0 -j MASQUERADE"                                  
 fi
