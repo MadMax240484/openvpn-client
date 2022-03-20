@@ -369,8 +369,6 @@ elif [[ $# -ge 1 ]]; then
 elif ps -ef | egrep -v 'grep|openvpn.sh' | grep -q openvpn; then
     echo "Service already running, please restart container to apply changes"
 else
-    net=$(ip r | grep tun0| awk '/tun0 proto kernel*/ {print $1}')
-    iptables -t nat -A POSTROUTING -s $net -o eth0 -j MASQUERADE                   
     mkdir -p /dev/net
     [[ -c /dev/net/tun ]] || mknod -m 0666 /dev/net/tun c 10 200
     [[ -e $conf ]] || { echo "ERROR: VPN not configured!"; sleep 120; }
@@ -379,4 +377,7 @@ else
     set -x
     exec sg vpn -c "openvpn --cd $dir --config $conf $ext_args \
                ${OTHER_ARGS:-} ${MSS:+--fragment $MSS --mssfix}"
+    echo "Добавляем маскарад."           
+    net=$(ip r | grep tun0| awk '/tun0 proto kernel*/ {print $1}')
+    iptables -t nat -A POSTROUTING -s $net -o eth0 -j MASQUERADE                                  
 fi
